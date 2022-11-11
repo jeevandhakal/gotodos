@@ -32,6 +32,16 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return &model.Todo{ID: todoID, Title: todo.Title, Description: todo.Description, Completed: todo.Completed, User: grahpqlUser}, nil
 }
 
+// ChangeCompletedStatus is the resolver for the changeCompletedStatus field.
+func (r *mutationResolver) ChangeCompletedStatus(ctx context.Context, input model.CompletedstatusInput) (*model.Todo, error) {
+	panic(fmt.Errorf("not implemented: ChangeCompletedStatus - changeCompletedStatus"))
+}
+
+// DeleteTodo is the resolver for the deleteTodo field.
+func (r *mutationResolver) DeleteTodo(ctx context.Context, id *int) ([]*model.Todo, error) {
+	panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
 	var user model.User
@@ -79,13 +89,8 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	user := auth.ForContext(ctx)
-	fmt.Println(user.Username)
-	var resultTodos []*model.Todo
 	dbTodos := model.GetTodos(user.Username)
-	for _, todo := range dbTodos {
-		resultTodos = append(resultTodos, &model.Todo{ID: todo.ID, Title: todo.Title, Description: todo.Description, Completed: todo.Completed})
-	}
-	return resultTodos, nil
+	return dbTodos, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -2,6 +2,11 @@
 
 package model
 
+type CompletedstatusInput struct {
+	ID        string `json:"id"`
+	Completed bool   `json:"completed"`
+}
+
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

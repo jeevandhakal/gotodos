@@ -36,8 +36,8 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 func GetUserIdByUsername(username string) (string, error) {
-	user := User{Username: username}
-	err := GetDB().First(&user).Error
+	var user User
+	err := GetDB().Table("users").Where("username=?", username).Find(&user).Error
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,13 +45,13 @@ func GetUserIdByUsername(username string) (string, error) {
 }
 
 func (user *User) Authenticate() bool {
-	usr := User{Username: user.Username}
-	err := GetDB().First(&usr).Error
+	var usr User
+	err := GetDB().Table("users").Where("username=?", user.Username).Find(&usr).Error
 
 	if err != nil {
 		log.Fatal(err)
 		return false
 	}
-
+	log.Print("authenticating the user ", usr.Username)
 	return CheckPasswordHash(user.Password, usr.Password)
 }
