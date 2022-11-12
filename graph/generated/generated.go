@@ -48,7 +48,7 @@ type ComplexityRoot struct {
 		ChangeCompletedStatus func(childComplexity int, input model.CompletedstatusInput) int
 		CreateTodo            func(childComplexity int, input model.NewTodo) int
 		CreateUser            func(childComplexity int, input model.NewUser) int
-		DeleteTodo            func(childComplexity int, id *int) int
+		DeleteTodo            func(childComplexity int, id string) int
 		Login                 func(childComplexity int, input model.Login) int
 		RefreshToken          func(childComplexity int, input model.RefreshTokenInput) int
 	}
@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error)
 	ChangeCompletedStatus(ctx context.Context, input model.CompletedstatusInput) (*model.Todo, error)
-	DeleteTodo(ctx context.Context, id *int) ([]*model.Todo, error)
+	DeleteTodo(ctx context.Context, id string) ([]*model.Todo, error)
 	CreateUser(ctx context.Context, input model.NewUser) (string, error)
 	Login(ctx context.Context, input model.Login) (string, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
@@ -145,7 +145,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteTodo(childComplexity, args["id"].(*int)), true
+		return e.complexity.Mutation.DeleteTodo(childComplexity, args["id"].(string)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -353,10 +353,9 @@ input Login {
 type Mutation {
   createTodo(input: NewTodo!): Todo!
   changeCompletedStatus(input: CompletedstatusInput!): Todo!
-  deleteTodo(id: Int): [Todo!]!
+  deleteTodo(id: ID!): [Todo!]!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
-  # we'll talk about this in authentication section
   refreshToken(input: RefreshTokenInput!): String!
 }
 `, BuiltIn: false},
@@ -415,10 +414,10 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_deleteTodo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -658,7 +657,7 @@ func (ec *executionContext) _Mutation_deleteTodo(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteTodo(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Mutation().DeleteTodo(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4361,22 +4360,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
 	return res
 }
 

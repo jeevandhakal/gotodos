@@ -34,12 +34,31 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // ChangeCompletedStatus is the resolver for the changeCompletedStatus field.
 func (r *mutationResolver) ChangeCompletedStatus(ctx context.Context, input model.CompletedstatusInput) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: ChangeCompletedStatus - changeCompletedStatus"))
+	user := auth.ForContext(ctx)
+	if user == nil || model.GetTodoUserID(input.ID) != user.ID {
+		return &model.Todo{}, fmt.Errorf("access denied")
+	}
+	result := model.UpdateTodo(input)
+	todo := &model.Todo{
+		ID:          result.ID,
+		Title:       result.Title,
+		Description: result.Description,
+		Completed:   result.Completed,
+		User: &model.User{
+			ID:       user.ID,
+			Username: user.Username,
+		},
+	}
+	return todo, nil
 }
 
 // DeleteTodo is the resolver for the deleteTodo field.
-func (r *mutationResolver) DeleteTodo(ctx context.Context, id *int) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
+func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) ([]*model.Todo, error) {
+	user := auth.ForContext(ctx)
+	if user == nil || model.GetTodoUserID(id) != user.ID {
+		return []*model.Todo{}, fmt.Errorf("access denied")
+	}
+	return model.DeleteTodo(id, user.Username), nil
 }
 
 // CreateUser is the resolver for the createUser field.

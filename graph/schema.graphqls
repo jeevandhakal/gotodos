@@ -44,9 +44,8 @@ input Login {
 type Mutation {
   createTodo(input: NewTodo!): Todo!
   changeCompletedStatus(input: CompletedstatusInput!): Todo!
-  deleteTodo(id: Int): [Todo!]!
+  deleteTodo(id: ID!): [Todo!]!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
-  # we'll talk about this in authentication section
   refreshToken(input: RefreshTokenInput!): String!
 }
