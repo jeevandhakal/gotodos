@@ -11,6 +11,7 @@ import (
 	"github.com/jeevandhakal/todos/auth"
 	"github.com/jeevandhakal/todos/graph"
 	"github.com/jeevandhakal/todos/graph/generated"
+	"github.com/jeevandhakal/todos/graph/model"
 )
 
 const defaultPort = "8080"
@@ -20,6 +21,9 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	// closing database
+	defer model.GetDB().Close()
 
 	router := chi.NewRouter()
 
