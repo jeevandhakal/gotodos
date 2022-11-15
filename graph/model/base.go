@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -10,7 +11,7 @@ import (
 
 var db *gorm.DB //database
 
-func init() {
+func InitDB() {
 
 	username := os.Getenv("db_user")
 	password := os.Getenv("db_pass")
@@ -21,11 +22,32 @@ func init() {
 
 	conn, err := gorm.Open("postgres", dbUri)
 	if err != nil {
-		fmt.Print(err)
+		log.Println(err)
 	}
 
 	db = conn
-	db.Debug().AutoMigrate(&Todo{}, &User{}) //Database migration
+	err = db.Exec(`CREATE TABLE IF NOT EXISTS users(
+		id serial PRIMARY KEY,
+		username VARCHAR(50) UNIQUE NOT NULL,
+		password VARCHAR(255) NOT NULL
+		);`).Error
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = db.Exec(`CREATE TABLE IF NOT EXISTS todos(
+		id serial PRIMARY KEY,
+		title VARCHAR(25) NOT NULL,
+		description VARCHAR(255),
+		completed BOOLEAN NOT NULL,
+		user_id int NOT NULL,
+		CONSTRAINT fk_user
+		FOREIGN KEY(user_id)
+		REFERENCES users(id)
+		ON DELETE CASCADE
+		);`).Error
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 //returns a handle to the DB object

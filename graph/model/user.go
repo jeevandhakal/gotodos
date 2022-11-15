@@ -16,10 +16,10 @@ func (user *User) Create() {
 	hashedPassword, _ := HashPassword(user.Password)
 	user.Password = string(hashedPassword)
 
-	result := GetDB().Create(user)
+	err := GetDB().Table("users").Create(&user).Error
 
-	if result.Error != nil {
-		log.Fatal(result.Error)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 

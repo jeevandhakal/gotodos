@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-type Result struct {
+type DbTotos struct {
 	ID          string
 	Title       string
 	Description string
@@ -13,23 +13,24 @@ type Result struct {
 }
 
 func (todo Todo) Create() string {
-	err := GetDB().Exec("Insert into todos(title,description,completed,user_id) values(?,?,?,?) returning id;", todo.Title, todo.Description, todo.Completed, todo.User.ID).Error
+	db_todo := DbTotos{
+		Title:       todo.Title,
+		Description: todo.Description,
+		Completed:   todo.Completed,
+		UserID:      todo.User.ID,
+	}
+	err := GetDB().Table("todos").Create(&db_todo).Error
 
 	if err != nil {
 		log.Fatal("Error: ", err)
 	}
+
 	log.Print("Row inserted!")
-
-	var toDo Todo
-	err = GetDB().Table("todos").Last(&toDo).Error
-	if err != nil {
-		log.Fatal("Error: ", err)
-	}
-	return toDo.ID
+	return db_todo.ID
 }
 
 func GetTodoUserID(id string) string {
-	todo := Result{}
+	todo := DbTotos{}
 	err := GetDB().Table("todos").Where("id = ?", id).Find(&todo).Error
 	if err != nil {
 		log.Fatal(err)
@@ -42,7 +43,7 @@ func GetTodos(username string) []*Todo {
 	todos := make([]*Todo, 0)
 	user_id, _ := GetUserIdByUsername(username)
 	log.Printf("Getting todos of user of id:%v and username:%v", user_id, username)
-	var results []Result
+	var results []DbTotos
 	err := GetDB().Table("todos").Where("user_id = ?", user_id).Find(&results).Error
 	if err != nil {
 		log.Fatal(err)
@@ -65,8 +66,8 @@ func GetTodos(username string) []*Todo {
 	return todos
 }
 
-func UpdateTodo(input CompletedstatusInput) Result {
-	var result Result
+func UpdateTodo(input CompletedstatusInput) DbTotos {
+	var result DbTotos
 	err := GetDB().Table("todos").Where("id = ?", input.ID).Find(&result).Error
 	if err != nil {
 		log.Fatal(err)
@@ -80,14 +81,14 @@ func UpdateTodo(input CompletedstatusInput) Result {
 }
 
 func DeleteTodo(id string, username string) []*Todo {
-	result := Result{ID: id}
+	result := DbTotos{ID: id}
 	err := GetDB().Table("todos").Delete(&result).Error
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var todos []*Todo
-	var results []Result
+	var results []DbTotos
 	user_id, _ := GetUserIdByUsername(username)
 	err = GetDB().Table("todos").Where("user_id = ?", user_id).Find(&results).Error
 	if err != nil {

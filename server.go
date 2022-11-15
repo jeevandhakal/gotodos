@@ -21,8 +21,10 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	// Initializing DB
+	model.InitDB()
 
-	// closing database
+	// Closing DB
 	defer model.GetDB().Close()
 
 	router := chi.NewRouter()
