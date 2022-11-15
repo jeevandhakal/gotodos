@@ -17,7 +17,7 @@
   - Change user password if you don't know the current user password with:
     - "ALTER USER user_name WITH PASSWORD 'new_password';"
   - You can check the username if you don't know the current username with:
-    "\l"
+    - "\l" List all the database details available in current schema
 - We are almost done setting database and tables so create environment variables in your system as:
 
   - db_user:"YOUR_DB_USERNAME"
