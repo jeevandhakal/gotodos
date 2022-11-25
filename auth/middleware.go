@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/jeevandhakal/todos/graph/model"
 )
@@ -26,8 +25,7 @@ func Middleware() func(http.Handler) http.Handler {
 			}
 
 			//validate jwt token
-			tokenStr := strings.Split(header, " ")[1]
-			username, err := ParseToken(tokenStr)
+			username, err := ParseToken(header)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusForbidden)
 				return
