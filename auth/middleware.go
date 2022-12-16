@@ -33,12 +33,12 @@ func Middleware() func(http.Handler) http.Handler {
 
 			// create user and check if user exists in db
 			user := model.User{Username: username}
-			id, err := model.GetUserIdByUsername(username)
+
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return
 			}
-			user.ID = id
+
 			// put it in context
 			ctx := context.WithValue(r.Context(), userCtxKey, &user)
 
