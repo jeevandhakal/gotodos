@@ -3,17 +3,19 @@ package resolver
 import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/jeevandhakal/todos/graph/generated"
-	"gorm.io/gorm"
+	"github.com/jeevandhakal/todos/pkg/adapter/controller"
 )
 
 // This file will not be regenerated automatically.
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct{ db *gorm.DB }
+type Resolver struct {
+	controller.Controller
+}
 
-func NewSchema(db *gorm.DB) graphql.ExecutableSchema {
+func NewSchema(controller controller.Controller) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{
-		Resolvers: &Resolver{db},
+		Resolvers: &Resolver{controller},
 	})
 }

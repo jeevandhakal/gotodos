@@ -13,7 +13,6 @@ type Query {
 input NewTodo {
   title: String!
   description: String!
-  completed: Boolean!
 }
 
 input CompletedstatusInput {
@@ -21,7 +20,7 @@ input CompletedstatusInput {
   completed: Boolean!
 }
 
-type Mutation {
+extend type Mutation {
   createTodo(input: NewTodo!): Todo!
   changeCompletedStatus(input: CompletedstatusInput!): Todo!
   deleteTodo(id: ID!): [Todo!]!

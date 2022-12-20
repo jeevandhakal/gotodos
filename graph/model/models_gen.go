@@ -2,9 +2,19 @@
 
 package model
 
+type CompletedstatusInput struct {
+	ID        string `json:"id"`
+	Completed bool   `json:"completed"`
+}
+
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type NewTodo struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 type NewUser struct {
